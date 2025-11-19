@@ -1,48 +1,49 @@
 """
-Database Schemas
+Database Schemas for Favor International
 
-Define your MongoDB collection schemas here using Pydantic models.
-These schemas are used for data validation in your application.
+Each Pydantic model maps to a MongoDB collection whose name is the lowercase of the class name.
+Example: Story -> "story" collection
 
-Each Pydantic model represents a collection in your database.
-Model name is converted to lowercase for the collection name:
-- User -> "user" collection
-- Product -> "product" collection
-- BlogPost -> "blogs" collection
+These schemas are used for validation before inserting into the database.
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from typing import Optional
+from datetime import date, datetime
 
-# Example schemas (replace with your own):
+# Content & Impact
+class Story(BaseModel):
+    id: Optional[str] = Field(None, description="Document ID")
+    title: str = Field(..., description="Story title")
+    content: str = Field(..., description="Full story text")
+    image_url: Optional[str] = Field(None, description="Primary image URL")
+    author_name: Optional[str] = Field(None, description="Author name")
+    published_date: Optional[date] = Field(None, description="Publish date")
 
-class User(BaseModel):
-    """
-    Users collection schema
-    Collection name: "user" (lowercase of class name)
-    """
+class Program(BaseModel):
+    id: Optional[str] = Field(None, description="Document ID")
+    name: str = Field(..., description="Program name")
+    description: str = Field(..., description="Program description")
+    region: Optional[str] = Field(None, description="Geographic region")
+    image_url: Optional[str] = Field(None, description="Representative image URL")
+
+# Engagement
+class Volunteer(BaseModel):
+    id: Optional[str] = Field(None, description="Document ID")
     name: str = Field(..., description="Full name")
-    email: str = Field(..., description="Email address")
-    address: str = Field(..., description="Address")
-    age: Optional[int] = Field(None, ge=0, le=120, description="Age in years")
-    is_active: bool = Field(True, description="Whether user is active")
+    email: EmailStr = Field(..., description="Email address")
+    phone: Optional[str] = Field(None, description="Phone number")
+    message: Optional[str] = Field(None, description="Message or motivation")
+    signup_date: Optional[date] = Field(None, description="Signup date")
 
-class Product(BaseModel):
-    """
-    Products collection schema
-    Collection name: "product" (lowercase of class name)
-    """
-    title: str = Field(..., description="Product title")
-    description: Optional[str] = Field(None, description="Product description")
-    price: float = Field(..., ge=0, description="Price in dollars")
-    category: str = Field(..., description="Product category")
-    in_stock: bool = Field(True, description="Whether product is in stock")
+class Donation(BaseModel):
+    id: Optional[str] = Field(None, description="Document ID")
+    full_name: str = Field(..., description="Donor full name")
+    email: EmailStr = Field(..., description="Donor email")
+    amount: float = Field(..., gt=0, description="Donation amount in USD")
+    donation_date: Optional[datetime] = Field(None, description="Donation timestamp")
 
-# Add your own schemas here:
-# --------------------------------------------------
-
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+class NewsletterSubscriber(BaseModel):
+    id: Optional[str] = Field(None, description="Document ID")
+    email: EmailStr = Field(..., description="Subscriber email")
+    subscribed_date: Optional[datetime] = Field(None, description="Subscription timestamp")
